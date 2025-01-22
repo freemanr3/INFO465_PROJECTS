@@ -1,59 +1,55 @@
-// This program calculates the mean and median of a list of integers entered by the user.
-// The user can type 'q' to finish entering numbers and see the results.
+const readline = require('readline');
 
-const numbers = []; // Array to store the numbers entered by the user
-let input; // Variable to store user input
+// Create an interface to read and write to the terminal
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
-console.log("Welcome! Please enter integers one by one.");
-console.log("Type 'q' to quit and calculate the results.");
+let numbers = [];
 
-while (true) {
-    // Ask the user for input
-    input = prompt("Enter a number (or 'q' to quit): ").trim();
+// Function to calculate the mean
+function calculateMean(arr) {
+  let sum = arr.reduce((acc, num) => acc + num, 0);
+  return sum / arr.length;
+}
 
-    // Check if the user wants to quit
+// Function to calculate the median
+function calculateMedian(arr) {
+  arr.sort((a, b) => a - b);
+  const mid = Math.floor(arr.length / 2);
+  
+  if (arr.length % 2 === 0) {
+    return (arr[mid - 1] + arr[mid]) / 2;
+  } else {
+    return arr[mid];
+  }
+}
+
+// Function to prompt the user for input
+function promptUser() {
+  rl.question('Enter a number (or "q" to quit): ', function(input) {
     if (input.toLowerCase() === 'q') {
-        break;
-    }
-
-    // Try to convert the input to a number
-    const number = parseInt(input, 10);
-
-    // Check if the input is a valid number
-    if (isNaN(number)) {
-        console.log("Invalid input. Please enter a valid integer.");
+      // Calculate and print mean and median when user quits
+      let mean = calculateMean(numbers);
+      let median = calculateMedian(numbers);
+      console.log(`Mean: ${mean}`);
+      console.log(`Median: ${median}`);
+      rl.close(); // Close the input interface
     } else {
-        // Add the valid number to the array
-        numbers.push(number);
+      // Check if the input is a valid number
+      let num = parseInt(input);
+      if (!isNaN(num)) {
+        numbers.push(num); // Add the number to the array
+      } else {
+        console.log('Please enter a valid number');
+      }
+      
+      // Continue prompting the user
+      promptUser();
     }
+  });
 }
 
-// Function to calculate the mean of an array of numbers
-function calculateMean(numbers) {
-    const sum = numbers.reduce((total, num) => total + num, 0); // Add all numbers together
-    return sum / numbers.length; // Divide by the number of numbers
-}
-
-// Function to calculate the median of an array of numbers
-function calculateMedian(numbers) {
-    numbers.sort((a, b) => a - b); // Sort the numbers in ascending order
-    const mid = Math.floor(numbers.length / 2); // Find the middle index
-
-    if (numbers.length % 2 === 0) {
-        // If there are an even number of numbers, return the average of the two middle ones
-        return (numbers[mid - 1] + numbers[mid]) / 2;
-    } else {
-        // If there are an odd number of numbers, return the middle one
-        return numbers[mid];
-    }
-}
-
-// Check if the user entered any valid numbers
-if (numbers.length === 0) {
-    console.log("No valid numbers entered. Program will exit.");
-} else {
-    // Display the results
-    console.log("Numbers entered:", numbers);
-    console.log("Mean (average):", calculateMean(numbers).toFixed(2)); // Show mean with 2 decimal places
-    console.log("Median:", calculateMedian(numbers));
-}
+// Start the user input loop
+promptUser();
